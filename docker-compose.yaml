@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  zoom:
+    build: .
+    ports:
+      - 3100:3000
+    volumes:
+      - /home/damien/work/zoomClone/:/app
+      - /home/damien/work/zoomClone/node_modules:/app/node_modules
+    command: npm run devStart 
+  peer:
+    image: peerjs/peerjs-server
+    ports:
+      - 3001:9000
+  
