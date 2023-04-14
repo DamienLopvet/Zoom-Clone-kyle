@@ -1,10 +1,14 @@
 // root path is facing docker root path
-const socket = io("http://localhost:3100/");
+const socket = io("/");
 const videoGrid = document.getElementById("video-grid");
 
+
+
 const myPeer = new Peer(undefined, {
-    host: "/",
-    port: "3001",
+    host: location.hostname,
+    secure: true,
+    port: location.port,
+    path: "peerjs"
 });
 
 const myVideo = document.createElement("video");
@@ -19,6 +23,7 @@ navigator.mediaDevices
         addVideoStream(myVideo, stream);
 
         myPeer.on("call", call => {
+            console.log('peer called');
             call.answer(stream);
             const video = document.createElement("video");
             call.on("stream", (userVideoStream) => {
@@ -28,8 +33,9 @@ navigator.mediaDevices
 
         socket.on("user-connected", (userId) => {
             connectToNewUser(userId, stream);
+            console.log(userId, stream);
         });
-    });
+    }).catch((err) => {console.error(err)})
 
 socket.on("user-disconnected", userId => {
 peers[userId]?.close()
@@ -37,6 +43,7 @@ peers[userId]?.close()
 
 myPeer.on("open", (id) => {
     socket.emit("join-room", ROOM_ID, id);
+    console.log('socket open');
 });
 
 function connectToNewUser(userId, stream) {
